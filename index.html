@@ -15,58 +15,55 @@
       defer
     ></script>
   </head>
-  <body x-data>
-    <h1 @click="console.log('CLICKED')" class="show-modal">Add Bookmark</h1>
+  <body
+    x-data="{ showModal: false, bookmarks: localStorage.getItem('bookmarks') ? JSON.parse(localStorage.getItem('bookmarks')) : [] }"
+    x-init="$watch('bookmarks', 
+    function(bms){ 
+      const ls = localStorage.getItem('bookmarks') ? JSON.parse(localStorage.getItem('bookmarks')) : [] ;
+      ls.push(bms[bms.length - 1]);
+      localStorage.setItem('bookmarks', [JSON.stringify(ls)]);
+
+      $refs.name.value = '';
+      $refs.url.value = '';
+
+      showModal = false;
+    })"
+  >
+    <h1 @click="showModal = true" class="show-modal">Add Bookmark</h1>
     <div class="container" id="bookmarks-container">
-      <div class="item">
-        <i
-          class="fas fa-times"
-          id="delete-book-mark"
-          title="Delete Bookmark"
-        ></i>
-        <div class="name">
-          <img
-            src="https://s2.googleusercontent.com/s2/favicons?domain=https://twitter.com"
-            alt="Favicon"
-          />
-          <a href="#" target="_blank">Website</a>
+      <template x-for="(item, index) in bookmarks" :key="index">
+        <div
+          class="item"
+          @click="!$event.target.classList.contains('fa-times') && window.open(item.url, '_blank')"
+        >
+          <i
+            class="fas fa-times"
+            id="delete-book-mark"
+            title="Delete Bookmark"
+            @click.prevent="bookmarks = bookmarks.filter(bm => bm.name !== item.name)"
+          ></i>
+          <div class="name">
+            <img
+              src="https://s2.googleusercontent.com/s2/favicons?domain=https://twitter.com"
+              alt="Favicon"
+            />
+            <a
+              href="#"
+              @click.prevent="window.open(item.url, '_blank')"
+              x-text="item.name"
+            ></a>
+          </div>
         </div>
-      </div>
-
-      <div class="item">
-        <i
-          class="fas fa-times"
-          id="delete-book-mark"
-          title="Delete Bookmark"
-        ></i>
-        <div class="name">
-          <img
-            src="https://s2.googleusercontent.com/s2/favicons?domain=https://twitter.com"
-            alt="Favicon"
-          />
-          <a href="#" target="_blank">Website</a>
-        </div>
-      </div>
-
-      <div class="item">
-        <i
-          class="fas fa-times"
-          id="delete-book-mark"
-          title="Delete Bookmark"
-        ></i>
-        <div class="name">
-          <img
-            src="https://s2.googleusercontent.com/s2/favicons?domain=https://twitter.com"
-            alt="Favicon"
-          />
-          <a href="#" target="_blank">Website</a>
-        </div>
-      </div>
+      </template>
     </div>
 
-    <div class="modal-container show-modal" id="modal">
-      <div class="modal">
-        <i class="fas fa-times close-icon" id="close-modal"></i>
+    <div x-show="showModal" class="modal-container show-modal" id="modal">
+      <div class="modal" @click.away="showModal = false">
+        <i
+          @click="showModal = false"
+          class="fas fa-times close-icon"
+          id="close-modal"
+        ></i>
         <div class="modal-header">
           <h3>Add Bookmark</h3>
         </div>
@@ -74,13 +71,30 @@
           <form action="" id="bookmark-form">
             <div class="form-group">
               <label for="website-name" class="form-label">Website Name</label>
-              <input type="text" class="form-input" id="website-name" />
+              <input
+                type="text"
+                x-ref="name"
+                class="form-input"
+                id="website-name"
+              />
             </div>
             <div class="form-group">
               <label for="website-url" class="form-label">Website URL</label>
-              <input type="url" class="form-input" id="website-url" />
+              <input
+                type="url"
+                x-ref="url"
+                class="form-input"
+                id="website-url"
+              />
             </div>
-            <button type="submit">Save</button>
+            <button
+              type="submit"
+              @click.prevent="$refs.name.value.length > 1 && $refs.url.value.includes('http') 
+              ? bookmarks.push({name:$refs.name.value,url:$refs.url.value})
+              : alert('Please enter a name & valid website URL')"
+            >
+              Save
+            </button>
           </form>
         </div>
       </div>
