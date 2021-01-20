@@ -53,3 +53,21 @@ h1:hover {
   cursor: pointer;
   user-select: none;
 }
+
+a {
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color:#fff;
+}
+
+a:link,
+a:visited {
+  columns: #fff;
+  text-decoration: none;
+}
+
+a:hover,
+a:active {
+  text-decoration: underline;
+}
