@@ -15,20 +15,7 @@
       defer
     ></script>
   </head>
-  <body
-    x-data="{ showModal: false, bookmarks: localStorage.getItem('bookmarks') ? JSON.parse(localStorage.getItem('bookmarks')) : [] }"
-    x-init="$watch('bookmarks', 
-    function(bms){ 
-      const ls = localStorage.getItem('bookmarks') ? JSON.parse(localStorage.getItem('bookmarks')) : [] ;
-      ls.push(bms[bms.length - 1]);
-      localStorage.setItem('bookmarks', [JSON.stringify(ls)]);
-
-      $refs.name.value = '';
-      $refs.url.value = '';
-
-      showModal = false;
-    })"
-  >
+  <body x-data="getData()">
     <h1 @click="showModal = true" class="show-modal">Add Bookmark</h1>
     <div class="container" id="bookmarks-container">
       <template x-for="(item, index) in bookmarks" :key="index">
@@ -40,7 +27,7 @@
             class="fas fa-times"
             id="delete-book-mark"
             title="Delete Bookmark"
-            @click.prevent="bookmarks = bookmarks.filter(bm => bm.name !== item.name)"
+            @click.prevent="removeBookmark({...item})"
           ></i>
           <div class="name">
             <img
@@ -90,7 +77,7 @@
             <button
               type="submit"
               @click.prevent="$refs.name.value.length > 1 && $refs.url.value.includes('http') 
-              ? bookmarks.push({name:$refs.name.value,url:$refs.url.value})
+              ? addBookmark({name:$refs.name.value, url:$refs.url.value})
               : alert('Please enter a name & valid website URL')"
             >
               Save
@@ -99,5 +86,6 @@
         </div>
       </div>
     </div>
+    <script src="/script.js"></script>
   </body>
 </html>
